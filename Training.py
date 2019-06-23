@@ -15,7 +15,12 @@ class Training:
     self.nClasses = nClasses
     self.model = model
 
-  def normalizarDados(self, data):
+  def normalizarDados(self, file):
+    # Le arquivo de entrada e normaliza dados
+    inputFile = open(file, 'r')
+    data = inputFile.readlines()
+    inputFile.close()
+
     dataset = []
     labels = []
 
@@ -32,16 +37,12 @@ class Training:
     return np.array(dataset), np.array(labels)
 
   def train(self, file, batchSize, epochs):
-    # Le arquivo de entrada e normaliza dados
-    inputFile = open(file, 'r')
-    data = inputFile.readlines()
-    inputFile.close()
+    data, labels = self.normalizarDados(file)
 
-    data, labels = self.normalizarDados(data)
-
-    # Particiona os dados em treinamento(75%) e validação(25%)
+    # Particiona os dados em treinamento e validacao
     (train_x, test_x, train_y, test_y) = train_test_split(
         data, labels, test_size=0.25)
+
     train_y = to_categorical(train_y, num_classes=self.nClasses)
     test_y = to_categorical(test_y, num_classes=self.nClasses)
 
@@ -51,7 +52,7 @@ class Training:
     # ----------------------------------
     # Processo de treinamento do modelo
     # ----------------------------------
-    H = self.model.fit(
+    self.train_result = self.model.fit(
         train_x,
         train_y,
         validation_data=(test_x, test_y),
@@ -59,7 +60,15 @@ class Training:
         batch_size=batchSize,
         verbose=2)
 
+  def teste(self, file):
+    data, labels = self.normalizarDados(file)
+    print(data)
+    print(labels)
+
+    (test_x, _, test_y, _) = train_test_split(data, labels, test_size=1)
+
+    test_y = to_categorical(test_y, num_classes=self.nClasses)
     pont = self.model.evaluate(test_x, test_y, verbose=1)
-    print("Erro de: %.2f%%", (100 - pont[1] * 100))
+    print("Erro de: %.2f%%" % (100 - pont[1] * 100))
 
     #report(self.model, test_x, test_y)
