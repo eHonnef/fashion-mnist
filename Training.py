@@ -62,8 +62,6 @@ class Training:
 
   def teste(self, file):
     data, labels = self.normalizarDados(file)
-    print(data)
-    print(labels)
 
     (test_x, _, test_y, _) = train_test_split(data, labels, test_size=1)
 
@@ -72,3 +70,6 @@ class Training:
     print("Erro de: %.2f%%" % (100 - pont[1] * 100))
 
     #report(self.model, test_x, test_y)
+  
+  def resultados(self):
+    pass
