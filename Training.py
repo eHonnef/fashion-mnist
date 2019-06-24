@@ -37,6 +37,9 @@ class Training:
     return np.array(dataset), np.array(labels)
 
   def train(self, file, batchSize, epochs):
+    self.batchSize = batchSize
+    self.epochs = epochs
+
     data, labels = self.normalizarDados(file)
 
     # Particiona os dados em treinamento e validacao
@@ -69,7 +72,49 @@ class Training:
     pont = self.model.evaluate(test_x, test_y, verbose=1)
     print("Erro de: %.2f%%" % (100 - pont[1] * 100))
 
-    #report(self.model, test_x, test_y)
-  
-  def resultados(self):
-    pass
+    self.resultados(test_x, test_y)
+
+  def resultados(self, test_x, test_y):
+    test_y = np.argmax(test_y, axis=1)
+
+    # Plot modelo
+    plot_model(
+        self.model,
+        to_file='plot/model.png',
+        show_shapes=True,
+        show_layer_names=True)
+
+    # Prever classes
+    y_pred = self.model.predict_classes(test_x, batch_size=self.batchSize)
+
+    # Reporte de Classificação
+    print("\n Reporte: \n", classification_report(test_y, y_pred, digits=10))
+
+    # Matriz de Confusão
+    cnf_matrix = confusion_matrix(test_y, y_pred)
+    print("\n Matriz de Confusão: \n", cnf_matrix)
+
+    # Plota a perda e as metricas
+    plt.style.use("ggplot")
+    plt.figure()
+    plt.plot(
+        np.arange(0, self.epochs),
+        self.train_result.history["loss"],
+        label="train_loss")
+    plt.plot(
+        np.arange(0, self.epochs),
+        self.train_result.history["val_loss"],
+        label="val_loss")
+    plt.plot(
+        np.arange(0, self.epochs),
+        self.train_result.history["acc"],
+        label="train_acc")
+    plt.plot(
+        np.arange(0, self.epochs),
+        self.train_result.history["val_acc"],
+        label="val_acc")
+    plt.xlabel("Epoch " + str(self.epochs))
+    plt.ylabel("Loss/Accuracy")
+    plt.legend(loc="lower left")
+    plt.title("Training Loss and Accuracy Adam")
+    plt.savefig("plot/fashion_mnist_Adam_01.png")

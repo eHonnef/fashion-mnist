@@ -7,7 +7,7 @@ if __name__ == '__main__':
   nClasses = 10     # Numero de classes (numero de itens)
   lr = 1e-2         #
   batchSize = 100   #
-  epochs = 20       # numero de epocas
+  epochs = 2       # numero de epocas
 
   # criando modelo
   model = NeuralNetwork().criar(nClasses, width*height, lr)
