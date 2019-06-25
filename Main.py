@@ -7,12 +7,13 @@ if __name__ == '__main__':
   nClasses = 10     # Numero de classes (numero de itens)
   lr = 1e-2         #
   batchSize = 100   #
-  epochs = 2       # numero de epocas
+  epochs = 20       # numero de epocas
+  epochsMax = 20    # numero maximo de epocas
+  erroMax = 10      # erro maximo (em porcentagem)
 
   # criando modelo
   model = NeuralNetwork().criar(nClasses, width*height, lr)
   
   # treinando modelo
   t = Training(model, nClasses)
-  t.train("./dados/fashion-mnist_train.csv", batchSize, epochs)
-  t.teste("./dados/fashion-mnist_test.csv")
+  t.treinamento("./dados/fashion-mnist_train.csv", "./dados/fashion-mnist_test.csv", batchSize, epochs, erroMax, epochsMax)

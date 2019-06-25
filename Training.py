@@ -36,11 +36,12 @@ class Training:
 
     return np.array(dataset), np.array(labels)
 
-  def train(self, file, batchSize, epochs):
+  def treinamento(self, file_treino, file_teste, batchSize, epochs, erroMax,
+                  epochsMax):
     self.batchSize = batchSize
-    self.epochs = epochs
+    self.epochs = 0
 
-    data, labels = self.normalizarDados(file)
+    data, labels = self.normalizarDados(file_treino)
 
     # Particiona os dados em treinamento e validacao
     (train_x, test_x, train_y, test_y) = train_test_split(
@@ -55,24 +56,30 @@ class Training:
     # ----------------------------------
     # Processo de treinamento do modelo
     # ----------------------------------
-    self.train_result = self.model.fit(
-        train_x,
-        train_y,
-        validation_data=(test_x, test_y),
-        epochs=epochs,
-        batch_size=batchSize,
-        verbose=2)
+    adata, alabels = self.normalizarDados(file_teste)
 
-  def teste(self, file):
-    data, labels = self.normalizarDados(file)
+    (atest_x, _, atest_y, _) = train_test_split(adata, alabels, test_size=1)
 
-    (test_x, _, test_y, _) = train_test_split(data, labels, test_size=1)
+    atest_y = to_categorical(atest_y, num_classes=self.nClasses)
+    erro = (100 - self.teste(atest_x, atest_y)[1] * 100
+           )  # em porcentagem [0~100],
 
-    test_y = to_categorical(test_y, num_classes=self.nClasses)
-    pont = self.model.evaluate(test_x, test_y, verbose=1)
-    print("Erro de: %.2f%%" % (100 - pont[1] * 100))
+    while erro > erroMax or self.epochs < epochsMax:
+      self.train_result = self.model.fit(
+          train_x,
+          train_y,
+          validation_data=(test_x, test_y),
+          epochs=epochs,
+          batch_size=batchSize,
+          verbose=2)
+      erro = (100 - self.teste(atest_x, atest_y)[1] * 100)
+      self.epochs += 1
+      print("Erro de: %.2f%%" % erro)
 
-    self.resultados(test_x, test_y)
+    self.resultados(atest_x, atest_y)
+
+  def teste(self, test_x, test_y):
+    return self.model.evaluate(test_x, test_y, verbose=1)
 
   def resultados(self, test_x, test_y):
     test_y = np.argmax(test_y, axis=1)
@@ -87,10 +94,10 @@ class Training:
     # Prever classes
     y_pred = self.model.predict_classes(test_x, batch_size=self.batchSize)
 
-    # Reporte de Classificação
+    # Reporte de Classificacao
     print("\n Reporte: \n", classification_report(test_y, y_pred, digits=10))
 
-    # Matriz de Confusão
+    # Matriz de Confusao
     cnf_matrix = confusion_matrix(test_y, y_pred)
     print("\n Matriz de Confusão: \n", cnf_matrix)
 
