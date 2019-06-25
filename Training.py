@@ -64,7 +64,7 @@ class Training:
     erro = (100 - self.teste(atest_x, atest_y)[1] * 100
            )  # em porcentagem [0~100],
 
-    while erro > erroMax or self.epochs < epochsMax:
+    while erro > erroMax and self.epochs < epochsMax:
       self.train_result = self.model.fit(
           train_x,
           train_y,
@@ -73,15 +73,16 @@ class Training:
           batch_size=batchSize,
           verbose=2)
       erro = (100 - self.teste(atest_x, atest_y)[1] * 100)
-      self.epochs += 1
+      self.epochs += epochs
       print("Erro de: %.2f%%" % erro)
+      print("Total de épocas: " + str(self.epochs))
 
-    self.resultados(atest_x, atest_y)
+    self.resultados(atest_x, atest_y, epochs)
 
   def teste(self, test_x, test_y):
     return self.model.evaluate(test_x, test_y, verbose=1)
 
-  def resultados(self, test_x, test_y):
+  def resultados(self, test_x, test_y, epochs):
     test_y = np.argmax(test_y, axis=1)
 
     # Plot modelo
@@ -105,19 +106,19 @@ class Training:
     plt.style.use("ggplot")
     plt.figure()
     plt.plot(
-        np.arange(0, self.epochs),
+        np.arange(0, epochs),
         self.train_result.history["loss"],
         label="train_loss")
     plt.plot(
-        np.arange(0, self.epochs),
+        np.arange(0, epochs),
         self.train_result.history["val_loss"],
         label="val_loss")
     plt.plot(
-        np.arange(0, self.epochs),
+        np.arange(0, epochs),
         self.train_result.history["acc"],
         label="train_acc")
     plt.plot(
-        np.arange(0, self.epochs),
+        np.arange(0, epochs),
         self.train_result.history["val_acc"],
         label="val_acc")
     plt.xlabel("Epoch " + str(self.epochs))

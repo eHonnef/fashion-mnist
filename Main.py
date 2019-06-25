@@ -8,7 +8,7 @@ if __name__ == '__main__':
   lr = 1e-2         #
   batchSize = 100   #
   epochs = 20       # numero de epocas
-  epochsMax = 20    # numero maximo de epocas
+  epochsMax = 200   # numero maximo de epocas
   erroMax = 10      # erro maximo (em porcentagem)
 
   # criando modelo
