@@ -9,7 +9,7 @@ class NeuralNetwork:
   # Cria e retorna uma rede neural
   @staticmethod
   def criar(nClasses, nPixels, lr):
-    hf = int(nPixels / 8)  # primeira camada oculta
+    hf = int(nPixels / 2)  # primeira camada oculta
     hs = int(nPixels / 12)  # segunda camada oculta
 
     model = Sequential()
